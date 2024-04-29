@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion : '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Amazon Cognito User Pool with Passwordless Facial Recognition Auth configured
@@ -12,11 +12,20 @@ Metadata:
     SpdxLicenseId: MIT-0
     LicenseUrl: LICENSE
     ReadmeUrl: README.md
-    Labels: ['cognito', 'passwordless', 'authentication', 'rekognition', 'facial', 'recognition', 'auth', 'sample']
+    Labels:
+      [
+        "cognito",
+        "passwordless",
+        "authentication",
+        "rekognition",
+        "facial",
+        "recognition",
+        "auth",
+        "sample",
+      ]
     HomepageUrl: https://github.com/aws-samples/amazon-cognito-facial-recognition-auth/tree/master/
     SemanticVersion: 1.0.2
     SourceCodeUrl: https://github.com/aws-samples/amazon-cognito-facial-recognition-auth/tree/master/
-
 
 Parameters:
   UserPoolName:
@@ -104,7 +113,6 @@ Resources:
                 - s3:getObject
                 - rekognition:SearchFacesByImage
               Resource: "*"
-      
 
   PreSignUp:
     Type: AWS::Serverless::Function
@@ -112,51 +120,49 @@ Resources:
       CodeUri: cognito-triggers/pre-sign-up/
       Handler: pre-sign-up.handler
       Runtime: nodejs14.x
-  
+
   RekognitionCollection:
     Type: Custom::CustomResource
     Properties:
-      ServiceToken: !GetAtt 'CreateRekognitionCollectionLambda.Arn'
+      ServiceToken: !GetAtt "CreateRekognitionCollectionLambda.Arn"
 
   BucketSignUp:
-    Type: 'AWS::S3::Bucket'
+    Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Ref DocumentUploadBucketName    
+      BucketName: !Ref DocumentUploadBucketName
 
   BucketSignIn:
-    Type: 'AWS::S3::Bucket'
+    Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Ref SignInUploadBucketName 
+      BucketName: !Ref SignInUploadBucketName
 
   CollectionTable:
     Type: AWS::DynamoDB::Table
-    Properties: 
-      AttributeDefinitions: 
+    Properties:
+      AttributeDefinitions:
         - AttributeName: RekognitionId
           AttributeType: S
         - AttributeName: FullName
           AttributeType: S
-      KeySchema: 
+      KeySchema:
         - AttributeName: RekognitionId
           KeyType: HASH
         - AttributeName: FullName
           KeyType: RANGE
-      GlobalSecondaryIndexes: 
-        - 
-          IndexName: FullName-index
-          KeySchema: 
+      GlobalSecondaryIndexes:
+        - IndexName: FullName-index
+          KeySchema:
             - AttributeName: FullName
               KeyType: HASH
-          Projection: 
+          Projection:
             ProjectionType: ALL
-          ProvisionedThroughput: 
+          ProvisionedThroughput:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 5
-      ProvisionedThroughput: 
+      ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: !Ref CollectionName
-
 
   DefineAuthChallengeInvocationPermission:
     Type: AWS::Lambda::Permission
@@ -231,19 +237,19 @@ Resources:
 Outputs:
   RekognitionCollectionArn:
     Description: The Amazon Rekognition Custom Collection ARN.
-    Value: !GetAtt 'RekognitionCollection.Message'
+    Value: !GetAtt "RekognitionCollection.Message"
   SignUpBucketName:
-    Value: !Ref 'BucketSignUp'
+    Value: !Ref "BucketSignUp"
     Description: Name of the sign up Amazon S3 bucket.
   SignInBucketName:
-    Value: !Ref 'BucketSignIn'
+    Value: !Ref "BucketSignIn"
     Description: Name of the sign in Amazon S3 bucket.
   TableName:
-    Value: !Ref 'CollectionTable'
+    Value: !Ref "CollectionTable"
     Description: Name of the DynamoDB table containing Rekognition metadata for each Cognito user
   UserPoolId:
-    Value: !Ref 'UserPool'
+    Value: !Ref "UserPool"
     Description: ID of the Cognito User Pool
   UserPoolWebClientId:
-    Value: !Ref 'UserPoolClient'
+    Value: !Ref "UserPoolClient"
     Description: ID of the Cognito User Pool Client for Front-End Subscription
