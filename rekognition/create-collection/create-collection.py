@@ -2,7 +2,7 @@ import boto3
 import os
 import json
 import logging
-from botocore.vendored import requests
+import requests
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
@@ -46,7 +46,7 @@ def sendResponse(event, context, responseStatus, responseData):
         req = requests.put(event['ResponseURL'], data=json.dumps(responseBody))
         if req.status_code != 200:
             LOGGER.info(req.text)
-            raise Exception('Recieved non 200 response while sending response to CFN.')
+            raise Exception('Received non 200 response while sending response to CFN.')
         return
     except requests.exceptions.RequestException as e:
         LOGGER.error(e)

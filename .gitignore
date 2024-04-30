@@ -63,3 +63,13 @@ typings/
 .next
 
 .DS_Store
+
+.aws-sam/
+
+# installed Python requirements
+*/create-collection/bin/
+*/create-collection/certifi*/
+*/create-collection/charset_normalizer*/
+*/create-collection/idna*/
+*/create-collection/urllib3*/
+*/create-collection/requests*/
