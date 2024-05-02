@@ -130,6 +130,16 @@ Resources:
     Type: "AWS::S3::Bucket"
     Properties:
       BucketName: !Ref DocumentUploadBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - http://localhost:5173
+            AllowedMethods:
+              - PUT
+              - POST
+            AllowedHeaders:
+              - "*"
+            MaxAge: 3000
 
   BucketSignIn:
     Type: "AWS::S3::Bucket"
