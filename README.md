@@ -1,5 +1,7 @@
 # Cognito Facial Recognition Auth Backend
 
+**_Note: this fork updates some of the dated runtimes / packages_**
+
 The purpose of this sample code is to demonstrate how Amazon Cognito Custom Authentication Flows can be used to implement passwordless facial recognition auth using Amazon Rekognition. Please treat the code as an _**illustration**_––thoroughly review it and adapt it to your needs, if you want to use it for production-ready workloads.
 
 This is an AWS Serverless Application. If you deploy it, this is what you get:
@@ -33,18 +35,22 @@ If you deploy the Serverless Application you'll get a CloudFormation stack with 
 
 NOTE: To deploy this application _**please pick an AWS Region in which you can use Amazon Cognito and Amazon Rekognition (i.e. us-east-1, us-west-2 or eu-west-1)**_ and create all resources (including the S3 bucket) in that region. This is not a hard requirement for setting up e-mail auth in Cognito in general; but it is so in this demo application to keep things simple.
 
+You will need to install the requests library into the create-collection lambda `pip install requests -t .` within it's directory.
+
 #### How to deploy the Serverless Application with AWS SAM CLI
 
 1. Clone this repo `git clone https://github.com/aws-samples/amazon-cognito-facial-recognition-auth.git`
 2. Enter cognito directory: `cd amazon-cognito-facial-recognition-auth`
 3. Install dependencies: `npm install`
 4. Set the following environment variables (all mandatory):
-  - S3_BUCKET_NAME='the bucket name of the bucket you want to use for your SAM deployment'
-  - SIGN_UP_S3_BUCKET='the bucket name of the bucket you want to use for your User's Photos upload during Sign Up'
-  - SIGN_IN_S3_BUCKET='the bucket name of the bucket you want to use for your User's Camera Pictures during Sign In'
-  - COLLECTION_NAME='the name you want your Amazon Rekognition Custom Collection to be created with'
-  - STACK_NAME='the name you want the CloudFormation stack to be created with'
-  - USER_POOL_NAME='the name you want your User Pool to be created with'
+
+- S3_BUCKET_NAME='the bucket name of the bucket you want to use for your SAM deployment'
+- SIGN_UP_S3_BUCKET='the bucket name of the bucket you want to use for your User's Photos upload during Sign Up'
+- SIGN_IN_S3_BUCKET='the bucket name of the bucket you want to use for your User's Camera Pictures during Sign In'
+- COLLECTION_NAME='the name you want your Amazon Rekognition Custom Collection to be created with'
+- STACK_NAME='the name you want the CloudFormation stack to be created with'
+- USER_POOL_NAME='the name you want your User Pool to be created with'
+
 5. Build and deploy the application: `npm run bd` This runs AWS SAM CLI
 
 if that succeeded, you have succesfully deployed your application. The outputs of the CloudFormation stack will contain, the ID's of the User Pool, Client that you can use in your client web app, your S3 Bucket Names, Collection ARN and DynamoDB table name.
