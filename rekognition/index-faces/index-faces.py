@@ -34,11 +34,10 @@ def update_index(tableName,faceId, fullName):
 # --------------- Main handler ------------------
 
 def handler(event, context):
-
     # Get the object from the event
     bucket = event['Records'][0]['s3']['bucket']['name']
-    key = urllib.parse.unquote_plus(
-        event['Records'][0]['s3']['object']['key'].encode('utf8'))
+    key = event['Records'][0]['s3']['object']['key']
+    key = urllib.parse.unquote_plus(key, encoding='utf8')
 
     try:
 

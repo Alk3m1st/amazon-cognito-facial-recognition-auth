@@ -60,6 +60,8 @@ Resources:
           Statement:
             - Effect: Allow
               Action:
+                - dynamodb:PutItem
+                - s3:getObject
                 - rekognition:IndexFaces
               Resource: "*"
 
