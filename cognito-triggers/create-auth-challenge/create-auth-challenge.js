@@ -1,43 +1,44 @@
-const aws = require('aws-sdk');
-const dynamodb = new aws.DynamoDB.DocumentClient();
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const {
+  DynamoDBDocumentClient,
+  QueryCommand,
+} = require("@aws-sdk/lib-dynamodb");
+
+const client = new DynamoDBClient({});
+const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 exports.handler = async (event, context) => {
+  console.log("Create auth challenge: " + JSON.stringify(event));
 
-    console.log("Create auth challenge: " + JSON.stringify(event));
+  if (event.request.challengeName == "CUSTOM_CHALLENGE") {
+    event.response.publicChallengeParameters = {};
 
-    if (event.request.challengeName == 'CUSTOM_CHALLENGE') {
-        event.response.publicChallengeParameters = {};
+    // Querying for Rekognition ids for the e-mail provided
+    const query = new QueryCommand({
+      TableName: process.env.COLLECTION_NAME,
+      IndexName: "FullName-index",
+      ProjectionExpression: "RekognitionId",
+      KeyConditionExpression: "FullName = :userId",
+      ExpressionAttributeValues: {
+        ":userId": event.request.userAttributes.email,
+      },
+    });
 
-        let answer = '';
-        // Querying for Rekognition ids for the e-mail provided
-        const params = {
-            TableName: process.env.COLLECTION_NAME,
-            IndexName: "FullName-index",
-            ProjectionExpression: "RekognitionId",
-            KeyConditionExpression: "FullName = :userId",
-            ExpressionAttributeValues: {
-                ":userId": event.request.userAttributes.email
-            }
-        }
-        
-        try {
-            const data = await dynamodb.query(params).promise();
-            data.Items.forEach(function (item) {
-                
-                answer = item.RekognitionId;
+    try {
+      const { Items } = await ddbDocClient.send(query);
+      Items.forEach((item) => {
+        event.response.publicChallengeParameters.captchaUrl =
+          item.RekognitionId;
+        event.response.privateChallengeParameters = {};
+        event.response.privateChallengeParameters.answer = item.RekognitionId;
+        event.response.challengeMetadata = "REKOGNITION_CHALLENGE";
 
-                event.response.publicChallengeParameters.captchaUrl = answer;
-                event.response.privateChallengeParameters = {};
-                event.response.privateChallengeParameters.answer = answer;
-                event.response.challengeMetadata = 'REKOGNITION_CHALLENGE';
-                
-                console.log("Create Challenge Output: " + JSON.stringify(event));
-                return event;
-            });
-        } catch (err) {
-            console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
-            throw err;
-        }
+        console.log("Create Challenge Output: " + JSON.stringify(event));
+      });
+    } catch (err) {
+      console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+      throw err;
     }
-    return event;
-}
+  }
+  return event;
+};
