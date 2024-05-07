@@ -47,6 +47,7 @@ Globals:
       Variables:
         COLLECTION_NAME: !Ref CollectionName
         BUCKET_SIGN_UP: !Ref DocumentUploadBucketName
+        BUCKET_SIGN_IN: !Ref SignInUploadBucketName
 
 Resources:
   IndexFaces:
@@ -147,6 +148,16 @@ Resources:
     Type: "AWS::S3::Bucket"
     Properties:
       BucketName: !Ref SignInUploadBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - http://localhost:5173
+            AllowedMethods:
+              - PUT
+              - POST
+            AllowedHeaders:
+              - "*"
+            MaxAge: 3000
 
   CollectionTable:
     Type: AWS::DynamoDB::Table
